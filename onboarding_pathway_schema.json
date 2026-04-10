@@ -1,0 +1,471 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sendoeth/pf-onboarding-pathway/onboarding_pathway_schema.json",
+  "title": "Post Fiat Onboarding Pathway Report",
+  "description": "Schema for onboarding pathway scanner reports. Models ordered integration checkpoints for PRODUCER and CONSUMER roles with dependency-aware progress tracking, readiness verdicts, and next-step commands.",
+  "type": "object",
+  "required": [
+    "scanner_version",
+    "meta",
+    "pathway_config",
+    "checkpoints",
+    "progress_summary",
+    "next_steps",
+    "verdict",
+    "hash_chain",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scanner_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "const": "1.0.0",
+      "description": "Semantic version of the scanner that produced this report"
+    },
+    "meta": {
+      "$ref": "#/$defs/scan_meta"
+    },
+    "pathway_config": {
+      "$ref": "#/$defs/pathway_config"
+    },
+    "checkpoints": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/checkpoint"
+      },
+      "description": "Ordered list of 8 checkpoints for the selected pathway role"
+    },
+    "progress_summary": {
+      "$ref": "#/$defs/progress_summary"
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/next_step"
+      },
+      "description": "Ordered actionable next steps with exact commands"
+    },
+    "verdict": {
+      "$ref": "#/$defs/scan_verdict"
+    },
+    "hash_chain": {
+      "$ref": "#/$defs/hash_chain"
+    },
+    "limitations": {
+      "$ref": "#/$defs/limitations"
+    }
+  },
+  "$defs": {
+    "scan_meta": {
+      "type": "object",
+      "required": [
+        "report_id",
+        "generated_at",
+        "generator_version",
+        "content_hash",
+        "role",
+        "scan_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "pattern": "^PATH-(PRODUCER|CONSUMER)-\\d{8}T\\d{6}Z$",
+          "description": "Unique report identifier with role and timestamp"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of report generation"
+        },
+        "generator_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Version of scan_pathway.py that generated this report"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 hash of report content excluding hash_chain"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["PRODUCER", "CONSUMER"],
+          "description": "Integration role being scanned"
+        },
+        "scan_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Date the scan was performed (YYYY-MM-DD)"
+        }
+      }
+    },
+    "pathway_config": {
+      "type": "object",
+      "required": [
+        "role",
+        "checkpoint_count",
+        "checkpoint_definitions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["PRODUCER", "CONSUMER"]
+        },
+        "checkpoint_count": {
+          "type": "integer",
+          "const": 8,
+          "description": "Number of checkpoints in the pathway"
+        },
+        "checkpoint_definitions": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/checkpoint_def"
+          },
+          "description": "Ordered checkpoint definitions with dependencies"
+        }
+      }
+    },
+    "checkpoint_def": {
+      "type": "object",
+      "required": [
+        "checkpoint_id",
+        "checkpoint_name",
+        "order",
+        "depends_on",
+        "protocol",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "type": "string",
+          "pattern": "^(C|P)-[A-Z]+$",
+          "description": "Unique checkpoint identifier with role prefix"
+        },
+        "checkpoint_name": {
+          "type": "string",
+          "description": "Human-readable checkpoint name"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(C|P)-[A-Z]+$"
+          },
+          "description": "Checkpoint IDs that must be COMPLETED before this one"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "Name of the protocol or tool this checkpoint validates"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "description": "What this checkpoint validates"
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "required": [
+        "checkpoint_id",
+        "checkpoint_name",
+        "order",
+        "status",
+        "validation",
+        "depends_on",
+        "blocked_by"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": {
+          "type": "string",
+          "pattern": "^(C|P)-[A-Z]+$"
+        },
+        "checkpoint_name": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "status": {
+          "type": "string",
+          "enum": ["COMPLETED", "PENDING", "BLOCKED", "SKIPPED"],
+          "description": "COMPLETED=all checks pass, PENDING=not yet validated, BLOCKED=dependency not met, SKIPPED=explicitly skipped"
+        },
+        "validation": {
+          "$ref": "#/$defs/checkpoint_validation"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Checkpoint IDs this depends on"
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Checkpoint IDs that are not COMPLETED, blocking this one"
+        }
+      }
+    },
+    "checkpoint_validation": {
+      "type": "object",
+      "required": [
+        "checks_run",
+        "checks_passed",
+        "checks_failed",
+        "pass_rate",
+        "details"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "checks_run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks_passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks_failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pass_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["check_name", "passed", "detail"],
+            "additionalProperties": false,
+            "properties": {
+              "check_name": {
+                "type": "string"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "progress_summary": {
+      "type": "object",
+      "required": [
+        "total_checkpoints",
+        "completed",
+        "pending",
+        "blocked",
+        "skipped",
+        "completion_rate",
+        "readiness"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "total_checkpoints": {
+          "type": "integer",
+          "const": 8
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "completion_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "readiness": {
+          "type": "string",
+          "enum": ["READY", "NEARLY_READY", "IN_PROGRESS", "NOT_STARTED", "BLOCKED"],
+          "description": "READY=8/8, NEARLY_READY=6-7/8, IN_PROGRESS=1-5/8, NOT_STARTED=0/8, BLOCKED=any blocked"
+        }
+      }
+    },
+    "next_step": {
+      "type": "object",
+      "required": [
+        "step_number",
+        "checkpoint_id",
+        "action",
+        "command",
+        "priority"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "step_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checkpoint_id": {
+          "type": "string",
+          "pattern": "^(C|P)-[A-Z]+$"
+        },
+        "action": {
+          "type": "string",
+          "description": "Human-readable description of what to do"
+        },
+        "command": {
+          "type": "string",
+          "description": "Exact command to run (python3 <tool> --args)"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+          "description": "CRITICAL=blocks others, HIGH=next in sequence, MEDIUM=optional improvement, LOW=polish"
+        }
+      }
+    },
+    "scan_verdict": {
+      "type": "object",
+      "required": [
+        "readiness",
+        "grade",
+        "completion_rate",
+        "rationale",
+        "recommendation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "readiness": {
+          "type": "string",
+          "enum": ["READY", "NEARLY_READY", "IN_PROGRESS", "NOT_STARTED", "BLOCKED"]
+        },
+        "grade": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D", "F"]
+        },
+        "completion_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Explanation of the verdict"
+        },
+        "recommendation": {
+          "type": "string",
+          "minLength": 10,
+          "description": "What to do next based on the verdict"
+        }
+      }
+    },
+    "hash_chain": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "report_hash",
+        "previous_report_hash"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "SHA-256"
+        },
+        "report_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "previous_report_hash": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Hash of previous report for this role, null if first scan"
+        }
+      }
+    },
+    "limitation": {
+      "type": "object",
+      "required": [
+        "id",
+        "description",
+        "bias_direction",
+        "bias_magnitude"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^LIM-\\d{3}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10
+        },
+        "bias_direction": {
+          "type": "string",
+          "enum": ["OVERSTATED_READINESS", "UNDERSTATED_READINESS", "INDETERMINATE"]
+        },
+        "bias_magnitude": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH"]
+        }
+      }
+    },
+    "limitations": {
+      "type": "object",
+      "required": [
+        "count",
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/limitation"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,583 @@
+{
+  "scanner_version": "1.0.0",
+  "meta": {
+    "report_id": "PATH-CONSUMER-20260410T172224Z",
+    "generated_at": "2026-04-10T17:22:24Z",
+    "generator_version": "1.0.0",
+    "content_hash": "f54051698284280c74bc2f179a9ec4568d5c73c6345099b929f51a15e849dc93",
+    "role": "CONSUMER",
+    "scan_date": "2026-04-10"
+  },
+  "pathway_config": {
+    "role": "CONSUMER",
+    "checkpoint_count": 8,
+    "checkpoint_definitions": [
+      {
+        "checkpoint_id": "C-DISCOVERY",
+        "checkpoint_name": "Discovery Protocol",
+        "order": 1,
+        "depends_on": [],
+        "protocol": "pf-discovery-protocol",
+        "description": "Locate and register with available signal producers via discovery protocol"
+      },
+      {
+        "checkpoint_id": "C-SCHEMA",
+        "checkpoint_name": "Schema Compliance",
+        "order": 2,
+        "depends_on": [
+          "C-DISCOVERY"
+        ],
+        "protocol": "pf-signal-schema",
+        "description": "Validate that discovered producer signals conform to canonical signal schema"
+      },
+      {
+        "checkpoint_id": "C-ROUTING",
+        "checkpoint_name": "Routing Configuration",
+        "order": 3,
+        "depends_on": [
+          "C-SCHEMA"
+        ],
+        "protocol": "pf-routing-protocol",
+        "description": "Configure signal routing with preflight filters, VOI gates, and duration limits"
+      },
+      {
+        "checkpoint_id": "C-TRUST",
+        "checkpoint_name": "Trust Evaluation",
+        "order": 4,
+        "depends_on": [
+          "C-ROUTING"
+        ],
+        "protocol": "pf-trust-gateway",
+        "description": "Evaluate producer trustworthiness across 5 dimensions before consuming signals"
+      },
+      {
+        "checkpoint_id": "C-ACCEPTANCE",
+        "checkpoint_name": "Acceptance Testing",
+        "order": 5,
+        "depends_on": [
+          "C-TRUST"
+        ],
+        "protocol": "pf-acceptance-test",
+        "description": "Run 7-check acceptance test to validate integration readiness"
+      },
+      {
+        "checkpoint_id": "C-CONSUMPTION",
+        "checkpoint_name": "Signal Consumption",
+        "order": 6,
+        "depends_on": [
+          "C-ACCEPTANCE"
+        ],
+        "protocol": "pf-consumer-activity-feed",
+        "description": "Begin consuming signals and generating activity feed with run tracking"
+      },
+      {
+        "checkpoint_id": "C-VERIFICATION",
+        "checkpoint_name": "Consumption Verification",
+        "order": 7,
+        "depends_on": [
+          "C-CONSUMPTION"
+        ],
+        "protocol": "pf-consumer-verification",
+        "description": "Verify consumption with replay runner and dated attestation"
+      },
+      {
+        "checkpoint_id": "C-MONITORING",
+        "checkpoint_name": "Health Monitoring",
+        "order": 8,
+        "depends_on": [
+          "C-VERIFICATION"
+        ],
+        "protocol": "pf-health-monitor",
+        "description": "Establish ongoing health monitoring with 6-dimension scoring and alerting"
+      }
+    ]
+  },
+  "checkpoints": [
+    {
+      "checkpoint_id": "C-DISCOVERY",
+      "checkpoint_name": "Discovery Protocol",
+      "order": 1,
+      "status": "PENDING",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 3,
+        "checks_failed": 2,
+        "pass_rate": 0.6,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Discovery result artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Discovery result is a dict"
+          },
+          {
+            "check_name": "has_producers",
+            "passed": false,
+            "detail": "No producers found in discovery result"
+          },
+          {
+            "check_name": "has_version",
+            "passed": false,
+            "detail": "No version field found"
+          },
+          {
+            "check_name": "has_timestamp",
+            "passed": true,
+            "detail": "Timestamp field present"
+          }
+        ]
+      },
+      "depends_on": [],
+      "blocked_by": []
+    },
+    {
+      "checkpoint_id": "C-SCHEMA",
+      "checkpoint_name": "Schema Compliance",
+      "order": 2,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 8,
+        "checks_passed": 8,
+        "checks_failed": 0,
+        "pass_rate": 1.0,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Signal sample artifact found"
+          },
+          {
+            "check_name": "has_signals",
+            "passed": true,
+            "detail": "Found 30 signal(s)"
+          },
+          {
+            "check_name": "signal_has_signal_id",
+            "passed": true,
+            "detail": "Signal has signal_id"
+          },
+          {
+            "check_name": "signal_has_symbol",
+            "passed": true,
+            "detail": "Signal has symbol"
+          },
+          {
+            "check_name": "signal_has_direction",
+            "passed": true,
+            "detail": "Signal has direction"
+          },
+          {
+            "check_name": "signal_has_confidence",
+            "passed": true,
+            "detail": "Signal has confidence"
+          },
+          {
+            "check_name": "direction_valid",
+            "passed": true,
+            "detail": "Direction 'bullish' is valid"
+          },
+          {
+            "check_name": "confidence_bounds",
+            "passed": true,
+            "detail": "Confidence 0.62 in [0,1]"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-DISCOVERY"
+      ],
+      "blocked_by": [
+        "C-DISCOVERY"
+      ]
+    },
+    {
+      "checkpoint_id": "C-ROUTING",
+      "checkpoint_name": "Routing Configuration",
+      "order": 3,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 5,
+        "checks_failed": 0,
+        "pass_rate": 1.0,
+        "details": [
+          {
+            "check_name": "signal_sample_exists",
+            "passed": true,
+            "detail": "Signal sample available for routing validation"
+          },
+          {
+            "check_name": "has_horizon",
+            "passed": true,
+            "detail": "Horizon/duration field present"
+          },
+          {
+            "check_name": "has_symbol",
+            "passed": true,
+            "detail": "Symbol field present for routing"
+          },
+          {
+            "check_name": "has_confidence",
+            "passed": true,
+            "detail": "Confidence field present for VOI gate"
+          },
+          {
+            "check_name": "has_regime",
+            "passed": true,
+            "detail": "Regime field present for routing decisions"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-SCHEMA"
+      ],
+      "blocked_by": [
+        "C-SCHEMA"
+      ]
+    },
+    {
+      "checkpoint_id": "C-TRUST",
+      "checkpoint_name": "Trust Evaluation",
+      "order": 4,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 4,
+        "checks_failed": 1,
+        "pass_rate": 0.8,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Trust evaluation artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Trust evaluation is a dict"
+          },
+          {
+            "check_name": "has_verdict",
+            "passed": true,
+            "detail": "Trust verdict present: {'recommendation': 'ADOPT_WITH_CAVEATS', 'confidence': 1, 'composite_trust_score': 0.624588, 'grade': 'C', 'rationale': 'Composite trust score: 62.5% (Grade C). Strengths: operational health, schema compliance, consumption track record. Weaknesses: proof integrity. Producer is usable with noted caveats. Review risk factors before integrating.', 'dimension_scores': {'operational_health': {'score': 0.722312, 'grade': 'B', 'weight': 0.25, 'source_field': 'health_report.composite.score', 'detail': 'Composite health 72.2%, all gates pass.'}, 'proof_integrity': {'score': 0.149539, 'grade': 'F', 'weight': 0.25, 'source_field': 'proof_surface.overall.brier_decomposition', 'detail': 'Accuracy 51.5%, Brier 0.2481, 2128 resolved, reputation 0.5556.'}, 'schema_compliance': {'score': 1.0, 'grade': 'A', 'weight': 0.15, 'source_field': 'health_report.dimensions.schema_conformance.score', 'detail': 'Schema conformance 100.0%.'}, 'consumption_track_record': {'score': 0.8425, 'grade': 'B', 'weight': 0.2, 'source_field': 'activity_feed.aggregate+attestation', 'detail': '1 consumer(s), 8295 signals, 23d span, 100% uptime; attestation present (age 104h)'}, 'artifact_currency': {'score': 0.5875, 'grade': 'C', 'weight': 0.15, 'source_field': 'all_artifacts.generated_at', 'detail': 'health_report: LIVE (1h); proof_surface: EXPIRED (362h); activity_feed: RECENT (2h); attestation: STALE (104h)'}}, 'verdict_thresholds': {'ADOPT': 0.75, 'ADOPT_WITH_CAVEATS': 0.55, 'WAIT': 0.35, 'AVOID': 0.0}, 'blocking_factors': None}"
+          },
+          {
+            "check_name": "verdict_valid",
+            "passed": true,
+            "detail": "Verdict 'ADOPT_WITH_CAVEATS' is valid"
+          },
+          {
+            "check_name": "has_dimensions",
+            "passed": false,
+            "detail": "No trust dimensions found"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-ROUTING"
+      ],
+      "blocked_by": [
+        "C-ROUTING"
+      ]
+    },
+    {
+      "checkpoint_id": "C-ACCEPTANCE",
+      "checkpoint_name": "Acceptance Testing",
+      "order": 5,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 6,
+        "checks_passed": 4,
+        "checks_failed": 2,
+        "pass_rate": 0.6667,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Acceptance report artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Acceptance report is a dict"
+          },
+          {
+            "check_name": "has_verdict",
+            "passed": true,
+            "detail": "Acceptance verdict present"
+          },
+          {
+            "check_name": "verdict_valid",
+            "passed": false,
+            "detail": "Readiness '' not in ('READY', 'NOT_READY', 'PARTIAL')"
+          },
+          {
+            "check_name": "has_checks",
+            "passed": false,
+            "detail": "No acceptance checks found"
+          },
+          {
+            "check_name": "has_grade",
+            "passed": true,
+            "detail": "Grade: A"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-TRUST"
+      ],
+      "blocked_by": [
+        "C-TRUST"
+      ]
+    },
+    {
+      "checkpoint_id": "C-CONSUMPTION",
+      "checkpoint_name": "Signal Consumption",
+      "order": 6,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 6,
+        "checks_passed": 2,
+        "checks_failed": 4,
+        "pass_rate": 0.3333,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Activity feed artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Activity feed is a dict"
+          },
+          {
+            "check_name": "has_runs",
+            "passed": false,
+            "detail": "No consumption runs recorded"
+          },
+          {
+            "check_name": "has_signals",
+            "passed": false,
+            "detail": "No signals consumed"
+          },
+          {
+            "check_name": "has_error_tracking",
+            "passed": false,
+            "detail": "No error tracking found"
+          },
+          {
+            "check_name": "has_continuity",
+            "passed": false,
+            "detail": "No continuity tracking found"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-ACCEPTANCE"
+      ],
+      "blocked_by": [
+        "C-ACCEPTANCE"
+      ]
+    },
+    {
+      "checkpoint_id": "C-VERIFICATION",
+      "checkpoint_name": "Consumption Verification",
+      "order": 7,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 1,
+        "checks_passed": 0,
+        "checks_failed": 1,
+        "pass_rate": 0.0,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": false,
+            "detail": "No verification report artifact provided"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-CONSUMPTION"
+      ],
+      "blocked_by": [
+        "C-CONSUMPTION"
+      ]
+    },
+    {
+      "checkpoint_id": "C-MONITORING",
+      "checkpoint_name": "Health Monitoring",
+      "order": 8,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 6,
+        "checks_passed": 4,
+        "checks_failed": 2,
+        "pass_rate": 0.6667,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Health report artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Health report is a dict"
+          },
+          {
+            "check_name": "has_dimensions",
+            "passed": true,
+            "detail": "Health dimensions present"
+          },
+          {
+            "check_name": "dimension_count",
+            "passed": true,
+            "detail": "Found 6 health dimensions"
+          },
+          {
+            "check_name": "has_composite",
+            "passed": false,
+            "detail": "No composite score found"
+          },
+          {
+            "check_name": "has_grade",
+            "passed": false,
+            "detail": "No grade found"
+          }
+        ]
+      },
+      "depends_on": [
+        "C-VERIFICATION"
+      ],
+      "blocked_by": [
+        "C-VERIFICATION"
+      ]
+    }
+  ],
+  "progress_summary": {
+    "total_checkpoints": 8,
+    "completed": 0,
+    "pending": 1,
+    "blocked": 7,
+    "skipped": 0,
+    "completion_rate": 0.0,
+    "readiness": "BLOCKED"
+  },
+  "next_steps": [
+    {
+      "step_number": 1,
+      "checkpoint_id": "C-DISCOVERY",
+      "action": "Run discovery protocol to locate available signal producers",
+      "command": "python3 discover_producers.py --registry-url <REGISTRY_URL> --output discovery_result.json",
+      "priority": "CRITICAL"
+    },
+    {
+      "step_number": 2,
+      "checkpoint_id": "C-SCHEMA",
+      "action": "Validate discovered signals against canonical schema",
+      "command": "python3 -c \"from schema_validator import SchemaValidator; v=SchemaValidator(); print(v.validate_signal(signal))\"",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 3,
+      "checkpoint_id": "C-ROUTING",
+      "action": "Configure preflight filters and routing policy for signal intake",
+      "command": "python3 preflight_filter.py --signal-file signals.json --policy routing_policy.json --output routed.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 4,
+      "checkpoint_id": "C-TRUST",
+      "action": "Evaluate producer trust across 5 dimensions before consuming signals",
+      "command": "python3 evaluate_trust.py --proof-surface proof_surface.json --health-report health.json --activity-feed feed.json --output trust_eval.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 5,
+      "checkpoint_id": "C-ACCEPTANCE",
+      "action": "Run 7-check acceptance test to validate integration readiness",
+      "command": "python3 acceptance_test.py --signal-sample signals.json --proof-surface proof_surface.json --trust-eval trust.json --output acceptance.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 6,
+      "checkpoint_id": "C-CONSUMPTION",
+      "action": "Begin consuming signals and generate activity feed",
+      "command": "python3 generate_feed.py --signal-log signal_log.json --proof-surface proof_surface.json --output activity_feed.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 7,
+      "checkpoint_id": "C-VERIFICATION",
+      "action": "Verify consumption with replay runner and generate attestation",
+      "command": "python3 replay_runner.py --signal-log signal_log.json --proof-surface proof_surface.json --adapter-manifest adapter.json --output verification.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 8,
+      "checkpoint_id": "C-MONITORING",
+      "action": "Set up ongoing health monitoring with 6-dimension scoring",
+      "command": "python3 check_health.py --proof-surface proof_surface.json --activity-feed feed.json --output health_report.json",
+      "priority": "MEDIUM"
+    }
+  ],
+  "verdict": {
+    "readiness": "BLOCKED",
+    "grade": "F",
+    "completion_rate": 0.0,
+    "rationale": "0/8 checkpoints completed. 7 checkpoint(s) blocked by unmet dependencies.",
+    "recommendation": "Resolve blocking dependencies first. Blocked checkpoints: C-SCHEMA, C-ROUTING, C-TRUST, C-ACCEPTANCE, C-CONSUMPTION, C-VERIFICATION, C-MONITORING."
+  },
+  "hash_chain": {
+    "algorithm": "SHA-256",
+    "report_hash": "18b845ab20eeac1c5e7bf5ed13c68b704361cd40cd80780c30aa1aaa1802824e",
+    "previous_report_hash": null
+  },
+  "limitations": {
+    "count": 6,
+    "items": [
+      {
+        "id": "LIM-001",
+        "description": "Scanner validates artifact structure but cannot verify live network connectivity or real-time producer availability",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "MEDIUM"
+      },
+      {
+        "id": "LIM-002",
+        "description": "Checkpoint validators check JSON structure and key fields but do not re-run full protocol validation pipelines",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-003",
+        "description": "Dependency propagation uses strict BLOCKED status which may understate readiness when partial progress exists on blocked checkpoints",
+        "bias_direction": "UNDERSTATED_READINESS",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-004",
+        "description": "Scanner does not validate temporal consistency between artifacts \u2014 a stale proof surface may pass structural checks",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "MEDIUM"
+      },
+      {
+        "id": "LIM-005",
+        "description": "Next-step commands use template paths that may not match the users actual file layout",
+        "bias_direction": "INDETERMINATE",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-006",
+        "description": "Hash chain previous_report_hash is null on first scan \u2014 chain integrity verification requires multiple scans over time",
+        "bias_direction": "INDETERMINATE",
+        "bias_magnitude": "LOW"
+      }
+    ]
+  }
+}

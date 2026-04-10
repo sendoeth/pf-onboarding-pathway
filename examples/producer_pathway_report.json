@@ -1,0 +1,555 @@
+{
+  "scanner_version": "1.0.0",
+  "meta": {
+    "report_id": "PATH-PRODUCER-20260410T172224Z",
+    "generated_at": "2026-04-10T17:22:24Z",
+    "generator_version": "1.0.0",
+    "content_hash": "e7fd71c087623a51e68adb28bdaee7a924343914f1b3cfd6306db4ea11aa2025",
+    "role": "PRODUCER",
+    "scan_date": "2026-04-10"
+  },
+  "pathway_config": {
+    "role": "PRODUCER",
+    "checkpoint_count": 8,
+    "checkpoint_definitions": [
+      {
+        "checkpoint_id": "P-SCHEMA",
+        "checkpoint_name": "Schema Compliance",
+        "order": 1,
+        "depends_on": [],
+        "protocol": "pf-signal-schema",
+        "description": "Ensure signals conform to canonical signal schema with required fields and valid enums"
+      },
+      {
+        "checkpoint_id": "P-DELIVERY",
+        "checkpoint_name": "Signal Delivery",
+        "order": 2,
+        "depends_on": [
+          "P-SCHEMA"
+        ],
+        "protocol": "pf-signal-schema",
+        "description": "Demonstrate reliable signal delivery with consistent cadence and valid timestamps"
+      },
+      {
+        "checkpoint_id": "P-RESOLUTION",
+        "checkpoint_name": "Resolution Protocol",
+        "order": 3,
+        "depends_on": [
+          "P-DELIVERY"
+        ],
+        "protocol": "pf-resolution-protocol",
+        "description": "Resolve signals against market outcomes with reputation formula and karma tracking"
+      },
+      {
+        "checkpoint_id": "P-PROOF",
+        "checkpoint_name": "Proof Surface",
+        "order": 4,
+        "depends_on": [
+          "P-RESOLUTION"
+        ],
+        "protocol": "pf-proof-protocol",
+        "description": "Maintain proof surface with CUSUM drift detection, rolling windows, and freshness grading"
+      },
+      {
+        "checkpoint_id": "P-DISCOVERY",
+        "checkpoint_name": "Discovery Registration",
+        "order": 5,
+        "depends_on": [
+          "P-PROOF"
+        ],
+        "protocol": "pf-discovery-protocol",
+        "description": "Register as discoverable producer with liveness grading and metadata"
+      },
+      {
+        "checkpoint_id": "P-HEALTH",
+        "checkpoint_name": "Health Reporting",
+        "order": 6,
+        "depends_on": [
+          "P-DISCOVERY"
+        ],
+        "protocol": "pf-health-monitor",
+        "description": "Generate health reports with 6-dimension scoring for consumer visibility"
+      },
+      {
+        "checkpoint_id": "P-TRUST",
+        "checkpoint_name": "Trust Readiness",
+        "order": 7,
+        "depends_on": [
+          "P-HEALTH"
+        ],
+        "protocol": "pf-trust-gateway",
+        "description": "Achieve trust evaluation readiness with ADOPT or ADOPT_WITH_CAVEATS verdict"
+      },
+      {
+        "checkpoint_id": "P-ACTIVITY",
+        "checkpoint_name": "Activity Feed",
+        "order": 8,
+        "depends_on": [
+          "P-TRUST"
+        ],
+        "protocol": "pf-consumer-activity-feed",
+        "description": "Publish consumer activity feed showing downstream consumption and error rates"
+      }
+    ]
+  },
+  "checkpoints": [
+    {
+      "checkpoint_id": "P-SCHEMA",
+      "checkpoint_name": "Schema Compliance",
+      "order": 1,
+      "status": "COMPLETED",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 5,
+        "checks_failed": 0,
+        "pass_rate": 1.0,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Signal sample artifact found"
+          },
+          {
+            "check_name": "has_signals",
+            "passed": true,
+            "detail": "Found 30 signal(s)"
+          },
+          {
+            "check_name": "required_fields",
+            "passed": true,
+            "detail": "All required fields present"
+          },
+          {
+            "check_name": "schema_version",
+            "passed": true,
+            "detail": "Schema version: 1.0.0"
+          },
+          {
+            "check_name": "symbol_format",
+            "passed": true,
+            "detail": "Symbol 'BTC' valid"
+          }
+        ]
+      },
+      "depends_on": [],
+      "blocked_by": []
+    },
+    {
+      "checkpoint_id": "P-DELIVERY",
+      "checkpoint_name": "Signal Delivery",
+      "order": 2,
+      "status": "COMPLETED",
+      "validation": {
+        "checks_run": 4,
+        "checks_passed": 4,
+        "checks_failed": 0,
+        "pass_rate": 1.0,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Signal sample available"
+          },
+          {
+            "check_name": "sufficient_signals",
+            "passed": true,
+            "detail": "30 signals (sufficient for cadence)"
+          },
+          {
+            "check_name": "timestamps_valid",
+            "passed": true,
+            "detail": "10/10 timestamps valid"
+          },
+          {
+            "check_name": "multi_symbol",
+            "passed": true,
+            "detail": "Delivers 4 symbols: BTC, ETH, LINK, SOL"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-SCHEMA"
+      ],
+      "blocked_by": []
+    },
+    {
+      "checkpoint_id": "P-RESOLUTION",
+      "checkpoint_name": "Resolution Protocol",
+      "order": 3,
+      "status": "PENDING",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 2,
+        "checks_failed": 3,
+        "pass_rate": 0.4,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Proof surface artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Proof surface is a dict"
+          },
+          {
+            "check_name": "has_resolved",
+            "passed": false,
+            "detail": "No resolved signals found"
+          },
+          {
+            "check_name": "has_accuracy",
+            "passed": false,
+            "detail": "No accuracy metric found"
+          },
+          {
+            "check_name": "has_karma",
+            "passed": false,
+            "detail": "No karma metric found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-DELIVERY"
+      ],
+      "blocked_by": []
+    },
+    {
+      "checkpoint_id": "P-PROOF",
+      "checkpoint_name": "Proof Surface",
+      "order": 4,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 2,
+        "checks_failed": 3,
+        "pass_rate": 0.4,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Proof surface artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Proof surface is a dict"
+          },
+          {
+            "check_name": "has_hash",
+            "passed": false,
+            "detail": "No content hash found"
+          },
+          {
+            "check_name": "has_freshness",
+            "passed": false,
+            "detail": "No freshness/drift data found"
+          },
+          {
+            "check_name": "has_windows",
+            "passed": false,
+            "detail": "No rolling windows found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-RESOLUTION"
+      ],
+      "blocked_by": [
+        "P-RESOLUTION"
+      ]
+    },
+    {
+      "checkpoint_id": "P-DISCOVERY",
+      "checkpoint_name": "Discovery Registration",
+      "order": 5,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 4,
+        "checks_passed": 2,
+        "checks_failed": 2,
+        "pass_rate": 0.5,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Discovery result artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Discovery result is a dict"
+          },
+          {
+            "check_name": "has_producers",
+            "passed": false,
+            "detail": "No producers registered"
+          },
+          {
+            "check_name": "has_liveness",
+            "passed": false,
+            "detail": "No liveness grading found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-PROOF"
+      ],
+      "blocked_by": [
+        "P-PROOF"
+      ]
+    },
+    {
+      "checkpoint_id": "P-HEALTH",
+      "checkpoint_name": "Health Reporting",
+      "order": 6,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 6,
+        "checks_passed": 4,
+        "checks_failed": 2,
+        "pass_rate": 0.6667,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Health report artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Health report is a dict"
+          },
+          {
+            "check_name": "has_dimensions",
+            "passed": true,
+            "detail": "Health dimensions present"
+          },
+          {
+            "check_name": "dimension_count",
+            "passed": true,
+            "detail": "Found 6 health dimensions"
+          },
+          {
+            "check_name": "has_composite",
+            "passed": false,
+            "detail": "No composite score found"
+          },
+          {
+            "check_name": "has_grade",
+            "passed": false,
+            "detail": "No grade found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-DISCOVERY"
+      ],
+      "blocked_by": [
+        "P-DISCOVERY"
+      ]
+    },
+    {
+      "checkpoint_id": "P-TRUST",
+      "checkpoint_name": "Trust Readiness",
+      "order": 7,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 5,
+        "checks_passed": 4,
+        "checks_failed": 1,
+        "pass_rate": 0.8,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Trust evaluation artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Trust evaluation is a dict"
+          },
+          {
+            "check_name": "has_verdict",
+            "passed": true,
+            "detail": "Trust verdict present: {'recommendation': 'ADOPT_WITH_CAVEATS', 'confidence': 1, 'composite_trust_score': 0.624588, 'grade': 'C', 'rationale': 'Composite trust score: 62.5% (Grade C). Strengths: operational health, schema compliance, consumption track record. Weaknesses: proof integrity. Producer is usable with noted caveats. Review risk factors before integrating.', 'dimension_scores': {'operational_health': {'score': 0.722312, 'grade': 'B', 'weight': 0.25, 'source_field': 'health_report.composite.score', 'detail': 'Composite health 72.2%, all gates pass.'}, 'proof_integrity': {'score': 0.149539, 'grade': 'F', 'weight': 0.25, 'source_field': 'proof_surface.overall.brier_decomposition', 'detail': 'Accuracy 51.5%, Brier 0.2481, 2128 resolved, reputation 0.5556.'}, 'schema_compliance': {'score': 1.0, 'grade': 'A', 'weight': 0.15, 'source_field': 'health_report.dimensions.schema_conformance.score', 'detail': 'Schema conformance 100.0%.'}, 'consumption_track_record': {'score': 0.8425, 'grade': 'B', 'weight': 0.2, 'source_field': 'activity_feed.aggregate+attestation', 'detail': '1 consumer(s), 8295 signals, 23d span, 100% uptime; attestation present (age 104h)'}, 'artifact_currency': {'score': 0.5875, 'grade': 'C', 'weight': 0.15, 'source_field': 'all_artifacts.generated_at', 'detail': 'health_report: LIVE (1h); proof_surface: EXPIRED (362h); activity_feed: RECENT (2h); attestation: STALE (104h)'}}, 'verdict_thresholds': {'ADOPT': 0.75, 'ADOPT_WITH_CAVEATS': 0.55, 'WAIT': 0.35, 'AVOID': 0.0}, 'blocking_factors': None}"
+          },
+          {
+            "check_name": "verdict_valid",
+            "passed": true,
+            "detail": "Verdict 'ADOPT_WITH_CAVEATS' is valid"
+          },
+          {
+            "check_name": "has_dimensions",
+            "passed": false,
+            "detail": "No trust dimensions found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-HEALTH"
+      ],
+      "blocked_by": [
+        "P-HEALTH"
+      ]
+    },
+    {
+      "checkpoint_id": "P-ACTIVITY",
+      "checkpoint_name": "Activity Feed",
+      "order": 8,
+      "status": "BLOCKED",
+      "validation": {
+        "checks_run": 6,
+        "checks_passed": 2,
+        "checks_failed": 4,
+        "pass_rate": 0.3333,
+        "details": [
+          {
+            "check_name": "artifact_exists",
+            "passed": true,
+            "detail": "Activity feed artifact found"
+          },
+          {
+            "check_name": "is_dict",
+            "passed": true,
+            "detail": "Activity feed is a dict"
+          },
+          {
+            "check_name": "has_runs",
+            "passed": false,
+            "detail": "No consumption runs recorded"
+          },
+          {
+            "check_name": "has_signals",
+            "passed": false,
+            "detail": "No signals consumed"
+          },
+          {
+            "check_name": "has_error_tracking",
+            "passed": false,
+            "detail": "No error tracking found"
+          },
+          {
+            "check_name": "has_continuity",
+            "passed": false,
+            "detail": "No continuity tracking found"
+          }
+        ]
+      },
+      "depends_on": [
+        "P-TRUST"
+      ],
+      "blocked_by": [
+        "P-TRUST"
+      ]
+    }
+  ],
+  "progress_summary": {
+    "total_checkpoints": 8,
+    "completed": 2,
+    "pending": 1,
+    "blocked": 5,
+    "skipped": 0,
+    "completion_rate": 0.25,
+    "readiness": "BLOCKED"
+  },
+  "next_steps": [
+    {
+      "step_number": 1,
+      "checkpoint_id": "P-RESOLUTION",
+      "action": "Resolve signals against market outcomes with reputation formula",
+      "command": "python3 resolve_signals.py --signals signals.json --prices prices.json --output resolved.json",
+      "priority": "HIGH"
+    },
+    {
+      "step_number": 2,
+      "checkpoint_id": "P-PROOF",
+      "action": "Build and maintain proof surface with drift detection",
+      "command": "python3 maintain_proof.py --resolved resolved.json --output proof_surface.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 3,
+      "checkpoint_id": "P-DISCOVERY",
+      "action": "Register as discoverable producer in protocol registry",
+      "command": "python3 register_producer.py --registry-url <REGISTRY_URL> --proof-surface proof_surface.json --producer-id <ID>",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 4,
+      "checkpoint_id": "P-HEALTH",
+      "action": "Generate health report with 6-dimension scoring",
+      "command": "python3 check_health.py --proof-surface proof_surface.json --activity-feed feed.json --output health_report.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 5,
+      "checkpoint_id": "P-TRUST",
+      "action": "Achieve trust-ready status with ADOPT verdict",
+      "command": "python3 evaluate_trust.py --proof-surface proof_surface.json --health-report health.json --output trust_eval.json",
+      "priority": "MEDIUM"
+    },
+    {
+      "step_number": 6,
+      "checkpoint_id": "P-ACTIVITY",
+      "action": "Publish activity feed showing downstream consumption",
+      "command": "python3 generate_feed.py --signal-log signal_log.json --proof-surface proof_surface.json --output activity_feed.json",
+      "priority": "MEDIUM"
+    }
+  ],
+  "verdict": {
+    "readiness": "BLOCKED",
+    "grade": "D",
+    "completion_rate": 0.25,
+    "rationale": "2/8 checkpoints completed. 5 checkpoint(s) blocked by unmet dependencies.",
+    "recommendation": "Resolve blocking dependencies first. Blocked checkpoints: P-PROOF, P-DISCOVERY, P-HEALTH, P-TRUST, P-ACTIVITY."
+  },
+  "hash_chain": {
+    "algorithm": "SHA-256",
+    "report_hash": "fff7bcf7522f2dd03aca5b6215c9c64b0796d77400bf91861adc1a37682425de",
+    "previous_report_hash": null
+  },
+  "limitations": {
+    "count": 6,
+    "items": [
+      {
+        "id": "LIM-001",
+        "description": "Scanner validates artifact structure but cannot verify live network connectivity or real-time producer availability",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "MEDIUM"
+      },
+      {
+        "id": "LIM-002",
+        "description": "Checkpoint validators check JSON structure and key fields but do not re-run full protocol validation pipelines",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-003",
+        "description": "Dependency propagation uses strict BLOCKED status which may understate readiness when partial progress exists on blocked checkpoints",
+        "bias_direction": "UNDERSTATED_READINESS",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-004",
+        "description": "Scanner does not validate temporal consistency between artifacts \u2014 a stale proof surface may pass structural checks",
+        "bias_direction": "OVERSTATED_READINESS",
+        "bias_magnitude": "MEDIUM"
+      },
+      {
+        "id": "LIM-005",
+        "description": "Next-step commands use template paths that may not match the users actual file layout",
+        "bias_direction": "INDETERMINATE",
+        "bias_magnitude": "LOW"
+      },
+      {
+        "id": "LIM-006",
+        "description": "Hash chain previous_report_hash is null on first scan \u2014 chain integrity verification requires multiple scans over time",
+        "bias_direction": "INDETERMINATE",
+        "bias_magnitude": "LOW"
+      }
+    ]
+  }
+}
